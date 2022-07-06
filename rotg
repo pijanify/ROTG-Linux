@@ -1,0 +1,58 @@
+#!/bin/bash
+echo "$(tput setaf 4)         RRRRRRRRRRRRRRRRR        OOOOOOOOO     TTTTTTTTTTTTTTTTTTTTTTT       GGGGGGGGGGGGG"
+echo "$(tput setaf 4)         R::::::::::::::::R     OO:::::::::OO   T:::::::::::::::::::::T    GGG::::::::::::G"
+echo "$(tput setaf 4)         R::::::RRRRRR:::::R  OO:::::::::::::OO T:::::::::::::::::::::T  GG:::::::::::::::G"
+echo "$(tput setaf 4)         RR:::::R     R:::::RO:::::::OOO:::::::OT:::::TT:::::::TT:::::T G:::::GGGGGGGG::::G"
+echo "$(tput setaf 4)           R::::R     R:::::RO::::::O   O::::::OTTTTTT  T:::::T  TTTTTTG:::::G       GGGGGG"
+echo "$(tput setaf 4)           R::::R     R:::::RO:::::O     O:::::O        T:::::T       G:::::G              "
+echo "$(tput setaf 4)           R::::RRRRRR:::::R O:::::O     O:::::O        T:::::T       G:::::G              "
+echo "$(tput setaf 4)           R:::::::::::::RR  O:::::O     O:::::O        T:::::T       G:::::G    GGGGGGGGGG"
+echo "$(tput setaf 4)           R::::RRRRRR:::::R O:::::O     O:::::O        T:::::T       G:::::G    G::::::::G"
+echo "$(tput setaf 4)           R::::R     R:::::RO:::::O     O:::::O        T:::::T       G:::::G    GGGGG::::G"
+echo "$(tput setaf 4)           R::::R     R:::::RO:::::O     O:::::O        T:::::T       G:::::G        G::::G"
+echo "$(tput setaf 4)           R::::R     R:::::RO::::::O   O::::::O        T:::::T        G:::::G       G::::G"
+echo "$(tput setaf 4)         RR:::::R     R:::::RO:::::::OOO:::::::O      TT:::::::TT       G:::::GGGGGGGG::::G"
+echo "$(tput setaf 4)         R::::::R     R:::::R OO:::::::::::::OO       T:::::::::T        GG:::::::::::::::G"
+echo "$(tput setaf 4)         R::::::R     R:::::R   OO:::::::::OO         T:::::::::T          GGG::::::GGG:::G"
+echo "$(tput setaf 4)         RRRRRRRR     RRRRRRR     OOOOOOOOO           TTTTTTTTTTT             GGGGGG   GGGG"
+echo "$(tput setaf 1)                                                                                Linux-based"
+echo "$(tput setaf 1)                                                                                Version:1.0"
+echo "$(tput setaf 1)                                                                                Created by:"
+echo "$(tput setaf 5)                                                                                   Pijanify"
+
+#Input the details needed
+echo "$(tput setaf 6)Masukkan link MPD:"
+read -r mpdlink
+echo "$(tput setaf 6)Masukkan KID:KEY:"
+read -r key
+echo "$(tput setaf 6)Final filename:"
+read -r fname
+#Inspect Manifest info to get video ID and audio ID
+#Choose highest bitrate for a good quality
+yt-dlp -q --progress --no-warnings --allow-u -F "$mpdlink"
+#Input video ID and audio ID
+echo "$(tput setaf 6)Masukkan VideoID:"
+read -r vidID
+echo "$(tput setaf 6)Masukkan AudioID:"
+read -r audID
+clear
+#Use yt-dlp to download DRM-protected video and audio
+echo "$(tput setaf 6)Downloading video+audio......"
+yt-dlp -q --progress --no-warnings --allow-u -f "$vidID"+"$audID" "$mpdlink" -o d -N 20
+clear
+#Decrypting
+echo "$(tput setaf 6)Decrypting video+audio......"
+mp4decrypt --show-progress --key "$key" d.*.mp4 dec.mp4 && mp4decrypt --show-progress --key "$key" d.*.m4a dec.m4a
+echo "$(tput setaf 6)Done!"
+clear
+echo "$(tput setaf 6)Merging video+audio......"
+#Merging
+ffmpeg -v quiet -stats -i dec.mp4 -i dec.m4a -c copy /var/www/html/"$fname"
+clear
+echo "$(tput setaf 6)Done..!"
+echo "$(tput setaf 6)Boleh akses file anda di directory /var/www/html/"
+ip=$(hostname -I | awk '{print $1}')
+echo "$(tput setaf 6)atau akses melalui IP VPS anda di:"
+echo "$(tput setaf 6)http://"$ip"/"$fname""
+echo "$(tput setaf 6)http://"$ip":81/"$fname""
+rm *.*
