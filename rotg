@@ -1,4 +1,5 @@
 #!/bin/bash
+clear
 echo "$(tput setaf 4)         RRRRRRRRRRRRRRRRR        OOOOOOOOO     TTTTTTTTTTTTTTTTTTTTTTT       GGGGGGGGGGGGG"
 echo "$(tput setaf 4)         R::::::::::::::::R     OO:::::::::OO   T:::::::::::::::::::::T    GGG::::::::::::G"
 echo "$(tput setaf 4)         R::::::RRRRRR:::::R  OO:::::::::::::OO T:::::::::::::::::::::T  GG:::::::::::::::G"
@@ -16,7 +17,7 @@ echo "$(tput setaf 4)         R::::::R     R:::::R OO:::::::::::::OO       T::::
 echo "$(tput setaf 4)         R::::::R     R:::::R   OO:::::::::OO         T:::::::::T          GGG::::::GGG:::G"
 echo "$(tput setaf 4)         RRRRRRRR     RRRRRRR     OOOOOOOOO           TTTTTTTTTTT             GGGGGG   GGGG"
 echo "$(tput setaf 1)                                                                                Linux-based"
-echo "$(tput setaf 1)                                                                                Version:1.0"
+echo "$(tput setaf 1)                                                                                Version:1.3"
 echo "$(tput setaf 1)                                                                                Created by:"
 echo "$(tput setaf 5)                                                                                   Pijanify"
 
@@ -25,8 +26,6 @@ echo "$(tput setaf 6)Masukkan link MPD:"
 read -r mpdlink
 echo "$(tput setaf 6)Masukkan KID:KEY:"
 read -r key
-echo "$(tput setaf 6)Final filename:"
-read -r fname
 #Inspect Manifest info to get video ID and audio ID
 #Choose highest bitrate for a good quality
 yt-dlp -q --progress --no-warnings --allow-u -F "$mpdlink"
@@ -35,6 +34,8 @@ echo "$(tput setaf 6)Masukkan VideoID:"
 read -r vidID
 echo "$(tput setaf 6)Masukkan AudioID:"
 read -r audID
+echo "$(tput setaf 6)Final filename:"
+read -r fname
 clear
 #Use yt-dlp to download DRM-protected video and audio
 echo "$(tput setaf 6)Downloading video+audio......"
@@ -49,10 +50,13 @@ echo "$(tput setaf 6)Merging video+audio......"
 #Merging
 ffmpeg -v quiet -stats -i dec.mp4 -i dec.m4a -c copy /var/www/html/"$fname"
 clear
-echo "$(tput setaf 6)Done..!"
-echo "$(tput setaf 6)Boleh akses file anda di directory /var/www/html/"
+echo "$(tput setaf 6)D O N E....!"
+echo "$(tput setaf 6)Boleh akses file anda di directory /var/www/html/"$fname""
 ip=$(hostname -I | awk '{print $1}')
 echo "$(tput setaf 6)atau akses melalui IP VPS anda di:"
 echo "$(tput setaf 6)http://"$ip"/"$fname""
+#Ignore this if your don't use port for your webserver or delete this command.
 echo "$(tput setaf 6)http://"$ip":81/"$fname""
+#Change to your own domain if any, otherwise, clear this command.
+echo "$(tput setaf 6)http://dl.pijanify.us:81/"$fname""
 rm *.*
